@@ -1,6 +1,5 @@
 package me.theminecoder.appbase.command;
 
-import com.beust.jcommander.internal.Maps;
 import me.theminecoder.appbase.util.ConsoleColor;
 
 import java.util.Map;
