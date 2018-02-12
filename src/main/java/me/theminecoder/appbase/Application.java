@@ -12,6 +12,7 @@ import me.theminecoder.appbase.logger.LoggingOutputStream;
 import me.theminecoder.appbase.util.ConsoleColor;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
+import org.slf4j.impl.AppLoggerFactory;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -30,7 +31,6 @@ public abstract class Application<A extends ArgConfigBase, C extends ConfigBase>
         System.setProperty("library.jansi.version", "CustomApplication");
         System.setProperty("jline.WindowsTerminal.directConsole", "false");
         AnsiConsole.systemInstall();
-
     }
 
     public static void boot(String name, Class<? extends Application> applicationClazz, String[] args) {
@@ -100,6 +100,8 @@ public abstract class Application<A extends ArgConfigBase, C extends ConfigBase>
             this.consoleReader.setExpandEvents(false);
 
             this.logger = new Logger(this, this.consoleReader);
+            AppLoggerFactory.initRoot(this.logger, this);
+
             System.setErr(new PrintStream(new LoggingOutputStream(this.logger, Level.SEVERE), true));
             System.setOut(new PrintStream(new LoggingOutputStream(this.logger, Level.INFO), true));
 

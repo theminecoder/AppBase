@@ -1,10 +1,7 @@
 package me.theminecoder.appbase.test;
 
 import me.theminecoder.appbase.Application;
-import me.theminecoder.appbase.arg.ArgConfigBase;
 import me.theminecoder.appbase.config.ConfigBase;
-
-import java.lang.reflect.Type;
 
 /**
  * @author theminecoder
