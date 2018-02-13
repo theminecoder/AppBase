@@ -2,6 +2,8 @@ package me.theminecoder.appbase;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
+import com.typesafe.config.ConfigBeanFactory;
+import com.typesafe.config.ConfigFactory;
 import jline.console.ConsoleReader;
 import me.theminecoder.appbase.arg.ArgConfigBase;
 import me.theminecoder.appbase.command.Command;
@@ -92,6 +94,13 @@ public abstract class Application<A extends ArgConfigBase, C extends ConfigBase>
         } catch (ParameterException e) {
             System.err.println("Could not parse arguments: " + e.getMessage());
             System.err.println("See \"" + appLine + " --help\" for more information");
+            System.exit(1);
+        }
+
+        try {
+            this.config = ConfigBeanFactory.create(ConfigFactory.load(), this.getConfigType());
+        } catch (Exception e) {
+            System.err.println("Could not parse config: " + e.getMessage());
             System.exit(1);
         }
 
