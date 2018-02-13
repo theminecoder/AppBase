@@ -2,6 +2,7 @@ package me.theminecoder.appbase;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
+import com.typesafe.config.Config;
 import com.typesafe.config.ConfigBeanFactory;
 import com.typesafe.config.ConfigFactory;
 import jline.console.ConsoleReader;
@@ -98,7 +99,12 @@ public abstract class Application<A extends ArgConfigBase, C extends ConfigBase>
         }
 
         try {
-            this.config = ConfigBeanFactory.create(ConfigFactory.load(), this.getConfigType());
+            Config loadedConfig = ConfigFactory.load();
+            if (argConfig.isDebug()) {
+                System.out.println("Loaded config:");
+                System.out.println(loadedConfig.toString());
+            }
+            this.config = ConfigBeanFactory.create(loadedConfig, this.getConfigType());
         } catch (Exception e) {
             System.err.println("Could not parse config: " + e.getMessage());
             System.exit(1);
