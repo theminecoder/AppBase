@@ -37,15 +37,19 @@ public abstract class Application<A extends ArgConfigBase, C extends ConfigBase>
     }
 
     public static void boot(String name, Class<? extends Application> applicationClazz, String[] args) {
+        Application application = null;
         try {
             Constructor<Application> constructor = (Constructor<Application>) applicationClazz.getDeclaredConstructor(String.class, String[].class);
             constructor.setAccessible(true);
-            Application application = constructor.newInstance(name, args);
+            application = constructor.newInstance(name, args);
             application.run();
-            application.running.set(false);
-            application.getExecutorService().shutdown();
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
+        } finally {
+            if (application != null) {
+                application.running.set(false);
+                application.getExecutorService().shutdown();
+            }
         }
     }
 
