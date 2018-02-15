@@ -36,15 +36,13 @@ public abstract class Application<A extends ArgConfigBase, C extends ConfigBase>
         AnsiConsole.systemInstall();
     }
 
-    public static void boot(String name, Class<? extends Application> applicationClazz, String[] args) {
+    public static void boot(String name, Class<? extends Application> applicationClazz, String[] args) throws Exception {
         Application application = null;
         try {
             Constructor<Application> constructor = (Constructor<Application>) applicationClazz.getDeclaredConstructor(String.class, String[].class);
             constructor.setAccessible(true);
             application = constructor.newInstance(name, args);
             application.run();
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException(e);
         } finally {
             if (application != null) {
                 application.running.set(false);
