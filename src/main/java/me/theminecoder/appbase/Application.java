@@ -38,11 +38,14 @@ public abstract class Application<A extends ArgConfigBase, C extends ConfigBase>
 
     public static void boot(String name, Class<? extends Application> applicationClazz, String[] args) throws Exception {
         Application application = null;
+        //noinspection CaughtExceptionImmediatelyRethrown //Needed for error printing
         try {
             Constructor<Application> constructor = (Constructor<Application>) applicationClazz.getDeclaredConstructor(String.class, String[].class);
             constructor.setAccessible(true);
             application = constructor.newInstance(name, args);
             application.run();
+        } catch (Exception e) {
+            throw e;
         } finally {
             if (application != null) {
                 application.running.set(false);
