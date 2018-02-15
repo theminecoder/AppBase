@@ -36,7 +36,7 @@ public abstract class Application<A extends ArgConfigBase, C extends ConfigBase>
         AnsiConsole.systemInstall();
     }
 
-    public static void boot(String name, Class<? extends Application> applicationClazz, String[] args) throws Exception {
+    public static void boot(String name, Class<? extends Application> applicationClazz, String[] args) {
         Application application = null;
         //noinspection CaughtExceptionImmediatelyRethrown //Needed for error printing
         try {
@@ -45,7 +45,7 @@ public abstract class Application<A extends ArgConfigBase, C extends ConfigBase>
             application = constructor.newInstance(name, args);
             application.run();
         } catch (Exception e) {
-            throw e;
+            throw new RuntimeException(e);
         } finally {
             if (application != null) {
                 application.running.set(false);
