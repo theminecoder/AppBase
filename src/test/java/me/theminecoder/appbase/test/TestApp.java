@@ -1,12 +1,11 @@
 package me.theminecoder.appbase.test;
 
 import me.theminecoder.appbase.Application;
-import me.theminecoder.appbase.config.ConfigBase;
 
 /**
  * @author theminecoder
  */
-public class TestApp extends Application<TestAppArgsConfig, ConfigBase> {
+public class TestApp extends Application {
     public static void main(String[] args) {
         boot("Test App", TestApp.class, args);
     }
@@ -17,19 +16,8 @@ public class TestApp extends Application<TestAppArgsConfig, ConfigBase> {
     }
 
     @Override
-    protected Class<TestAppArgsConfig> getArgConfigType() {
-        return TestAppArgsConfig.class;
-    }
-
-    @Override
-    protected Class<ConfigBase> getConfigType() {
-        return ConfigBase.class;
-    }
-
-    @Override
     protected void run() {
-        this.getLogger().info("Test Arg: " + this.getArgConfig().test);
-
+        this.getLogger().info("Test Arg: " + this.getArgConfig(TestAppArgsConfig.class).test);
         runMainCommandLoop();
     }
 }
