@@ -152,6 +152,11 @@ public abstract class Application {
         return this.running.get();
     }
 
+    public final void shutdown() {
+        this.running.set(false);
+        this.executorService.shutdown();
+    }
+
     protected abstract void run();
 
     protected final void runMainCommandLoop() {
