@@ -2,7 +2,6 @@ package me.theminecoder.appbase;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
-import com.typesafe.config.Config;
 import com.typesafe.config.ConfigBeanFactory;
 import com.typesafe.config.ConfigFactory;
 import jline.console.ConsoleReader;
@@ -28,7 +27,7 @@ import java.util.logging.Level;
 /**
  * @author theminecoder
  */
-public abstract class Application<A extends ArgConfigBase, C extends ConfigBase> {
+public abstract class Application {
 
     static {
         System.setProperty("library.jansi.version", "CustomApplication");
@@ -62,21 +61,12 @@ public abstract class Application<A extends ArgConfigBase, C extends ConfigBase>
     private final String applicationName;
     private final ScheduledExecutorService executorService;
 
-    private A argConfig;
-    private C config;
+    private String[] args;
+    private String appLine;
 
     protected Application(String name, String[] args) {
         this.applicationName = name;
         this.executorService = new ScheduledThreadPoolExecutor(8, new ApplicationThreadFactory(this));
-
-        try {
-            argConfig = getArgConfigType().newInstance();
-            config = getConfigType().newInstance();
-        } catch (ReflectiveOperationException e) {
-            System.err.println("Cannot construct config objects! (Must have public no-arg constructor)");
-            e.printStackTrace();
-            return;
-        }
 
         String jarName = new java.io.File(Application.class.getProtectionDomain()
                 .getCodeSource()
@@ -84,36 +74,9 @@ public abstract class Application<A extends ArgConfigBase, C extends ConfigBase>
                 .getPath())
                 .getName();
         if (jarName.equalsIgnoreCase("classes")) jarName = "app.jar";
-        String appLine = "java -jar " + jarName;
+        appLine = "java -jar " + jarName;
 
-        try {
-            JCommander jCommander = new JCommander(argConfig, args);
-            if (argConfig.isDisplayHelp()) {
-                jCommander.setProgramName(appLine);
-                jCommander.usage();
-                System.exit(0);
-            }
-
-            if (argConfig.isDisableAnsi()) {
-                Ansi.setEnabled(false);
-            }
-        } catch (ParameterException e) {
-            System.err.println("Could not parse arguments: " + e.getMessage());
-            System.err.println("See \"" + appLine + " --help\" for more information");
-            System.exit(1);
-        }
-
-        try {
-            Config loadedConfig = ConfigFactory.load();
-            if (argConfig.isDebug()) {
-                System.out.println("Loaded config:");
-                System.out.println(loadedConfig.toString());
-            }
-            this.config = ConfigBeanFactory.create(loadedConfig, this.getConfigType());
-        } catch (Exception e) {
-            System.err.println("Could not parse config: " + e.getMessage());
-            System.exit(1);
-        }
+        this.args = args;
 
         try {
             this.consoleReader = new ConsoleReader();
@@ -145,12 +108,34 @@ public abstract class Application<A extends ArgConfigBase, C extends ConfigBase>
         return applicationName;
     }
 
-    public final A getArgConfig() {
-        return argConfig;
+    public final <A extends ArgConfigBase> A getArgConfig(Class<A> argConfigClass) {
+        try {
+            A configObject = argConfigClass.newInstance();
+
+            JCommander jCommander = new JCommander(configObject, args);
+            if (configObject.isDisplayHelp()) {
+                jCommander.setProgramName(appLine);
+                jCommander.usage();
+                System.exit(0);
+            }
+
+            if (configObject.isDisableAnsi()) {
+                Ansi.setEnabled(false);
+            }
+
+            return configObject;
+        } catch (ParameterException e) {
+            System.err.println("Could not parse arguments: " + e.getMessage());
+            System.err.println("See \"" + appLine + " --help\" for more information");
+            System.exit(1);
+            return null;
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public final C getConfig() {
-        return config;
+    public final <C extends ConfigBase> C getConfig(Class<C> configClass) {
+        return ConfigBeanFactory.create(ConfigFactory.load(), configClass);
     }
 
     public final ScheduledExecutorService getExecutorService() {
@@ -164,10 +149,6 @@ public abstract class Application<A extends ArgConfigBase, C extends ConfigBase>
     public final boolean isRunning() {
         return this.running.get();
     }
-
-    protected abstract Class<A> getArgConfigType();
-
-    protected abstract Class<C> getConfigType();
 
     protected abstract void run();
 
