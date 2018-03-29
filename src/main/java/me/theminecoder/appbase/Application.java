@@ -123,6 +123,8 @@ public abstract class Application {
                 Ansi.setEnabled(false);
             }
 
+            logger.setLevel(configObject.isDebug() ? Level.ALL : Level.INFO);
+
             return configObject;
         } catch (ParameterException e) {
             System.err.println("Could not parse arguments: " + e.getMessage());

@@ -39,8 +39,7 @@ public class Logger extends java.util.logging.Logger {
         this.application = application;
         this.dispatcher = new LogDispatcher(this.application, this);
 
-        // Check on which level we want to log
-        setLevel(application.getArgConfig().isDebug() ? Level.ALL : Level.INFO);
+        setLevel(Level.ALL);
 
         try {
             // Create the folder for the logfiles if needed
