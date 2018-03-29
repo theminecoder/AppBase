@@ -54,6 +54,7 @@ public abstract class Application {
     }
 
     private final AtomicBoolean running = new AtomicBoolean(true);
+    private final AtomicBoolean shutdown = new AtomicBoolean(false);
 
     private ConsoleReader consoleReader = null;
     private Logger logger = null;
@@ -153,14 +154,14 @@ public abstract class Application {
     }
 
     public final void shutdown() {
-        this.running.set(false);
+        this.shutdown.set(true);
     }
 
     protected abstract void run();
 
     protected final void runMainCommandLoop() {
         try {
-            while (isRunning()) {
+            while (isRunning() && !this.shutdown.get()) {
                 String line = this.consoleReader.readLine(this.applicationName + " > ");
                 if (line != null && line.length() > 0) {
                     String[] split = line.split(" ");
