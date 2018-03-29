@@ -154,7 +154,6 @@ public abstract class Application {
 
     public final void shutdown() {
         this.running.set(false);
-        this.executorService.shutdown();
     }
 
     protected abstract void run();
