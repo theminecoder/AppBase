@@ -45,10 +45,6 @@ public final class CommandManager {
     }
 
     public static Command getCommand(String name) {
-        if (!commandNamePattern.matcher(name).matches()) {
-            throw new IllegalArgumentException("Invalid command name! (No Regex match: " + commandNamePattern.pattern() + ")");
-        }
-
         name = name.toLowerCase();
         return commandMap.get(name);
     }
