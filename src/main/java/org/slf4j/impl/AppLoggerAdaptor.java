@@ -22,6 +22,11 @@ public final class AppLoggerAdaptor extends MarkerIgnoringBase implements Locati
         this.name = logger.getName();
     }
 
+    public AppLoggerAdaptor setLevel(Level level) {
+        this.logger.setLevel(level);
+        return this;
+    }
+
     public boolean isTraceEnabled() {
         return this.logger.isLoggable(Level.FINEST);
     }
